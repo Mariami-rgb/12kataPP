@@ -35,13 +35,9 @@ public class AdminController {
     }
 
     @PostMapping("/admin/addUser")
-    public String addUser(@ModelAttribute("user") User user, @RequestParam List<Long> roles, Model model) {
-//        Collection<Role> userRoles = new HashSet<>();
-//        for (String role : roles) {
-//            Role roleObj = userService.getRole(Integer.parseInt(role));
-//            userRoles.add(roleObj);
-//        }
+    public String addUser(@ModelAttribute("user") User user, @RequestParam List<Long> roles) {
         Collection<Role> userRoles = userService.getRoles(roles);
+        System.out.println(userRoles);
         user.setRoles(userRoles);
         userService.saveUser(user);
         return "redirect:/admin";
@@ -51,12 +47,14 @@ public class AdminController {
     public String editUser(Model model, @PathVariable("id") long id) {
         User user = userService.getUser(id);
         model.addAttribute("user", user);
+        Collection<Role> roles = userService.getAllRoles();
+        model.addAttribute("allRoles", roles);
         return "edit-user";
     }
 
     @PostMapping("/admin/update/{id}")
     public String updateUser(@PathVariable int id, @ModelAttribute("user") User user) {
-        userService.updateUser(user);
+        userService.saveUser(user);
         return "redirect:/admin";
     }
 

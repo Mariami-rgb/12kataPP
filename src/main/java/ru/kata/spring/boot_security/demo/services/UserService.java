@@ -6,8 +6,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.entities.Role;
 import ru.kata.spring.boot_security.demo.entities.User;
@@ -16,18 +14,14 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
 
-    @PersistenceContext
-    private EntityManager em;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -68,30 +62,20 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User getUser(long id) {
-        TypedQuery<User> query = em.createQuery("select u from User u where u.id = :id", User.class)
-                .setParameter("id", id);
-        return query.getResultList().stream().findAny().orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
     @Transactional
     public void deleteUser(long id) {
-        em.remove(em.find(User.class, id));
+        userRepository.deleteById(id);
     }
+
 
     @Transactional
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 
-    @Transactional
-    public Role getRole(long id) {
-        return roleRepository.getById(id);
-    }
-
-    @Transactional
-    public void updateUser(User user) {
-        em.merge(user);
-    }
 
     @Transactional
     public Collection<Role> getRoles(Collection<Long> ids) {
