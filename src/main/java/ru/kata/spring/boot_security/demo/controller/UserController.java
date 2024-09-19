@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -21,7 +23,6 @@ public class UserController {
     public String getUser(Principal principal, Model model) {
         String username = principal.getName();
         User user = userService.findByUsername(username);
-        System.out.println(user);
         model.addAttribute("user", user);
         return "user";
     }

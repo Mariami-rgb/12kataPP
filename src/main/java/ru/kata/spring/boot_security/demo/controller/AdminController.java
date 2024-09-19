@@ -8,6 +8,8 @@ import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
+import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,27 +20,36 @@ public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
 
-    public AdminController(final UserService userService, final RoleService roleService) {
+    public AdminController(UserService userService,RoleService roleService) {
         this.userService = userService;
         this.roleService=roleService;
     }
 
     @GetMapping("")
-    public String getUsers(Model model){
+    public String getUsers(Model model, Principal principal){
+        String username = principal.getName();
+        User user = userService.findByUsername(username);
+        model.addAttribute("user", user);
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
+        List<Role> roles = roleService.getAllRoles();
+        model.addAttribute("allRoles", roles);
+        User newUser = new User();
+        model.addAttribute("newUser", newUser);
         return "admin";
     }
 
-    @GetMapping(value = "/new")
-    public String addNewUser(@ModelAttribute("user") User user, Model model) {
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
-        return "add-user";
-    }
+//    @GetMapping(value = "/admin/new")
+//    public String addNewUser(@ModelAttribute("user") User user, Model model) {
+//        List<Role> roles = roleService.getAllRoles();
+//        model.addAttribute("allRoles", roles);
+//        return "add-user";
+//    }
 
     @PostMapping("/addUser")
-    public String addUser(@ModelAttribute("user") User user, @RequestParam List<Long> roles) {
+    public String addUser(@ModelAttribute("newUser") User user, @RequestParam List<Long> roles, Model model) {
+        List<Role> allRoles = roleService.getAllRoles();
+        model.addAttribute("allRoles", allRoles);
         Collection<Role> userRoles = roleService.getRoles(roles);
         System.out.println(userRoles);
         user.setRoles(userRoles);
@@ -46,17 +57,17 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/edit/{id}")
-    public String editUser(Model model, @PathVariable("id") long id) {
-        User user = userService.getUser(id);
-        model.addAttribute("user", user);
-        Collection<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
-        return "edit-user";
-    }
-
+//    @GetMapping("/edit/{id}")
+//    public String editUser(Model model, @PathVariable("id") long id) {
+//        User user = userService.getUser(id);
+//        model.addAttribute("user", user);
+//        Collection<Role> roles = roleService.getAllRoles();
+//        model.addAttribute("allRoles", roles);
+//        return "edit-user";
+//    }
+//
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable int id, @ModelAttribute("user") User user) {
+    public String updateUser(@PathVariable("id") long id, @ModelAttribute("user") @Valid User user) {
         userService.saveUser(user);
         return "redirect:/admin";
     }
