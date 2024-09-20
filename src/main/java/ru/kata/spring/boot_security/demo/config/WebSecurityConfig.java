@@ -6,6 +6,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.service.DetailServiceImpl;
@@ -16,13 +17,11 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
-    private final UserService userService;
-    private final DetailServiceImpl detailServiceImpl;
+    private final UserDetailsService detailService;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService, DetailServiceImpl detailServiceImpl) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserDetailsService detailService) {
         this.successUserHandler = successUserHandler;
-        this.userService = userService;
-        this.detailServiceImpl = detailServiceImpl;
+        this.detailService = detailService;
     }
 
     @Override
@@ -35,12 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-//                .loginPage("/login")
                 .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
-//                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
                 .permitAll();
     }
@@ -53,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(detailServiceImpl);
+        authProvider.setUserDetailsService(detailService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

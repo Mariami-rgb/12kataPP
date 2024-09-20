@@ -39,33 +39,16 @@ public class AdminController {
         return "admin";
     }
 
-//    @GetMapping(value = "/admin/new")
-//    public String addNewUser(@ModelAttribute("user") User user, Model model) {
-//        List<Role> roles = roleService.getAllRoles();
-//        model.addAttribute("allRoles", roles);
-//        return "add-user";
-//    }
-
     @PostMapping("/addUser")
     public String addUser(@ModelAttribute("newUser") User user, @RequestParam List<Long> roles, Model model) {
         List<Role> allRoles = roleService.getAllRoles();
         model.addAttribute("allRoles", allRoles);
         Collection<Role> userRoles = roleService.getRoles(roles);
-        System.out.println(userRoles);
         user.setRoles(userRoles);
         userService.saveUser(user);
         return "redirect:/admin";
     }
 
-//    @GetMapping("/edit/{id}")
-//    public String editUser(Model model, @PathVariable("id") long id) {
-//        User user = userService.getUser(id);
-//        model.addAttribute("user", user);
-//        Collection<Role> roles = roleService.getAllRoles();
-//        model.addAttribute("allRoles", roles);
-//        return "edit-user";
-//    }
-//
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") long id, @ModelAttribute("user") @Valid User user) {
         userService.saveUser(user);
