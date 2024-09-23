@@ -43,7 +43,7 @@ public class AdminController {
     public String addUser(@ModelAttribute("newUser") User user, @RequestParam List<Long> roles, Model model) {
         List<Role> allRoles = roleService.getAllRoles();
         model.addAttribute("allRoles", allRoles);
-        Collection<Role> userRoles = roleService.getRoles(roles);
+        List<Role> userRoles = roleService.getRoles(roles);
         user.setRoles(userRoles);
         userService.saveUser(user);
         return "redirect:/admin";

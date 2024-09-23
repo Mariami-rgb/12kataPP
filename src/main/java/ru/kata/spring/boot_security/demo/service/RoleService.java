@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface RoleService {
     public List<Role> getAllRoles();
-    public Collection<Role> getRoles(Collection<Long> ids);
+    public List<Role> getRoles(List<Long> ids);
 }
