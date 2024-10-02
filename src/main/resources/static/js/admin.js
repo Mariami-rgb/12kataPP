@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     getAllUsers();
     getRoles();
     setupCloseButtons();
+    showUsersTableTab();
 });
 
 
@@ -18,7 +19,7 @@ function getCurrentUser() {
 
 function getAllUsers() {
     const tbody = document.getElementById("data-tbody");
-    tbody.innerHTML='';
+    tbody.innerHTML = '';
     fetch("/admin/users")
         .then(response => response.json())
         .then(users => users.forEach(user => {
@@ -90,7 +91,9 @@ document.getElementById('addUser').addEventListener('submit', function (event) {
             console.log(1, user);
             getAllUsers();
             document.getElementById('addUser').reset();
-            new bootstrap.Modal(document.getElementById('addNewUser')).hide();
+            // new bootstrap.Modal(document.getElementById('addNewUser')).hide();
+            switchTab('#allUserTable');
+            // location.reload();
         })
         .catch(error => {
             console.error('Error creating user:', error);
@@ -291,6 +294,19 @@ function setupCloseButtons() {
 }
 
 // document.getElementById('submitButton').addEventListener('click', function (){
-//     location.reload();
+// redirectToUrl('#usersTable')
 // })
+
+// function redirectToUrl(url) {
+//     window.location.href = url;
+// }
+
+function switchTab(tabId) {
+    document.querySelector('#newUser').classList.remove('active');
+    document.querySelector(tabId).classList.add("active");
+    document.querySelector('#newUser').setAttribute('aria-selected', 'false');
+    document.querySelector(tabId).setAttribute('aria-selected', 'true');
+    document.querySelector('#addNewUser').classList.remove('active' , 'show');
+    document.querySelector('#usersTable').classList.add('active' , 'show');
+}
 
