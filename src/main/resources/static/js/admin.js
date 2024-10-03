@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
     getAllUsers();
     getRoles();
     setupCloseButtons();
-    showUsersTableTab();
 });
 
 
@@ -91,9 +90,7 @@ document.getElementById('addUser').addEventListener('submit', function (event) {
             console.log(1, user);
             getAllUsers();
             document.getElementById('addUser').reset();
-            // new bootstrap.Modal(document.getElementById('addNewUser')).hide();
             switchTab('#allUserTable');
-            // location.reload();
         })
         .catch(error => {
             console.error('Error creating user:', error);
@@ -132,7 +129,7 @@ function openEditUserPopup(userId) {
     modal.show();
 }
 
-// Обработчик отправки формы редактирования пользователя
+
 document.getElementById('editUserForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const formData = new FormData(this);
@@ -175,7 +172,7 @@ document.getElementById('editUserForm').addEventListener('submit', function (eve
         });
 });
 
-// Функция для удаления пользователя
+
 function openDeleteUserPopup(userId) {
     console.log('Opening edit modal for user ID:', userId);
     fetch(`/admin/${userId}`)
@@ -200,15 +197,14 @@ function openDeleteUserPopup(userId) {
         })
         .catch(error => {
             console.error('Error fetching user:', error);
-            // alert('Ошибка при загрузке данных пользователя');
         });
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     modal.show();
 }
 
-// Обработчик отправки формы редактирования пользователя
+
 document.getElementById('deleteUserForm').addEventListener('submit', function (event) {
-    // event.preventDefault();
+    event.preventDefault();
     const formData = new FormData(this);
     const userId = document.getElementById('deleteUserId').value;
     const rolesSelected = Array.from(document.getElementById('deleteRoles').selectedOptions).map(option => ({
@@ -216,12 +212,6 @@ document.getElementById('deleteUserForm').addEventListener('submit', function (e
     }));
     const user = {
         id: userId, // ID пользователя обязательно
-        // firstName: document.getElementById('deleteFirstName').value,
-        // lastName: document.getElementById('editLastName').value,
-        // age: parseInt(document.getElementById('editAge').value, 10),
-        // username: document.getElementById('editEmail').value,
-        // password: document.getElementById('editPassword').value,
-        // roles: rolesSelected
     };
     console.log('Deleting user:', user);
     fetch(`/admin/delete/${userId}`, { // Исправлен путь
@@ -233,7 +223,9 @@ document.getElementById('deleteUserForm').addEventListener('submit', function (e
     })
         .then(response => {
             if (response.ok) {
-                alert('Пользователь успешно удален!');
+                getAllUsers();
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`deleteModal`));
+                modal.hide();
             } else {
                 return response.json().then(data => {
                     console.error('Ошибка обновления:', data);
@@ -246,7 +238,7 @@ document.getElementById('deleteUserForm').addEventListener('submit', function (e
         });
 });
 
-// Функция для открытия модального окна
+
 function openModal(modalId) {
     console.log('Opening modal:', modalId);
     const modal = document.getElementById(modalId);
@@ -258,7 +250,7 @@ function openModal(modalId) {
     }
 }
 
-// Функция для закрытия модального окна
+
 function closeModal(modalId) {
     console.log('Closing modal:', modalId);
     const modal = document.getElementById(modalId);
@@ -270,7 +262,7 @@ function closeModal(modalId) {
     }
 }
 
-// Функция для установки обработчиков закрытия модальных окон
+
 function setupCloseButtons() {
     const closeButtons = document.querySelectorAll('.close-popup');
     closeButtons.forEach(button => {
@@ -292,14 +284,6 @@ function setupCloseButtons() {
         document.body.style.overflow = 'auto';
     });
 }
-
-// document.getElementById('submitButton').addEventListener('click', function (){
-// redirectToUrl('#usersTable')
-// })
-
-// function redirectToUrl(url) {
-//     window.location.href = url;
-// }
 
 function switchTab(tabId) {
     document.querySelector('#newUser').classList.remove('active');
